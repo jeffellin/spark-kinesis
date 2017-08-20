@@ -1,8 +1,2 @@
 [default]
 region = us-east-1
-[profile espn]
-region = us-east-1
-[profile sandbox]
-region = us-east-1
-[profile ellin]
-region = us-east-1
