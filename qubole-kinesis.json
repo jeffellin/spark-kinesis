@@ -1,0 +1,309 @@
+{
+  "paragraphs": [
+    {
+      "text": "import com.amazonaws.regions.RegionUtils\nimport com.amazonaws.services.kinesis.clientlibrary.lib.worker.InitialPositionInStream\nimport org.apache.spark._\nimport org.apache.spark.rdd.RDD\nimport org.apache.spark.sql.types.{StringType, StructField, StructType}\nimport org.apache.spark.sql.{Row, SQLContext, SaveMode}\nimport org.apache.spark.storage._\nimport org.apache.spark.streaming._\nimport org.apache.spark.streaming.kinesis._\nimport org.json4s.jackson.JsonMethods.parse\nimport org.json4s.DefaultFormats\nimport org.json4s.jackson.JsonMethods.parse\nimport org.json4s.DefaultFormats\nimport org.apache.spark.sql.functions._",
+      "user": "jellin@qubole.com",
+      "dateUpdated": "Aug 23, 2017 8:00:32 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1503516856339_-340430655",
+      "id": "20170823-193416_1673029550",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "\nimport com.amazonaws.regions.RegionUtils\n\nimport com.amazonaws.services.kinesis.clientlibrary.lib.worker.InitialPositionInStream\n\nimport org.apache.spark._\n\nimport org.apache.spark.rdd.RDD\n\nimport org.apache.spark.sql.types.{StringType, StructField, StructType}\n\nimport org.apache.spark.sql.{Row, SQLContext, SaveMode}\n\nimport org.apache.spark.storage._\n\nimport org.apache.spark.streaming._\n\nimport org.apache.spark.streaming.kinesis._\n\nimport org.json4s.jackson.JsonMethods.parse\n\nimport org.json4s.DefaultFormats\n\nimport org.json4s.jackson.JsonMethods.parse\n\nimport org.json4s.DefaultFormats\n\nimport org.apache.spark.sql.functions._\n"
+      },
+      "dateCreated": "Aug 23, 2017 7:34:16 PM",
+      "dateStarted": "Aug 23, 2017 8:00:32 PM",
+      "dateFinished": "Aug 23, 2017 8:01:06 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "\n  val awsAccessKeyId \u003d \"\"\n  val awsSecretKey \u003d \"\"\n  val kinesisStreamName \u003d \"iot-stream\"\n  val kinesisEndpointUrl \u003d \"kinesis.us-east-1.amazonaws.com\"\n  val kinesisAppName \u003d \"SBSStreamingReader\"\n  val kinesisCheckpointIntervalSeconds \u003d 1\n  val batchIntervalSeconds \u003d 60",
+      "user": "jellin@qubole.com",
+      "dateUpdated": "Aug 23, 2017 8:01:12 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1503516970340_-425708638",
+      "id": "20170823-193610_1960040532",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "\nawsAccessKeyId: String \u003d \n\nawsSecretKey: String \u003d \n\nkinesisStreamName: String \u003d iot-stream\n\nkinesisEndpointUrl: String \u003d kinesis.us-east-1.amazonaws.com\n\nkinesisAppName: String \u003d SBSStreamingReader\n\nkinesisCheckpointIntervalSeconds: Int \u003d 1\n\nbatchIntervalSeconds: Int \u003d 60\n"
+      },
+      "dateCreated": "Aug 23, 2017 7:36:10 PM",
+      "dateStarted": "Aug 23, 2017 8:01:12 PM",
+      "dateFinished": "Aug 23, 2017 8:01:15 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "val ssc \u003d new StreamingContext(sc, Seconds(batchIntervalSeconds))\n\n\n// Creata a Kinesis stream\nval kinesisStream \u003d  (0 until 1).map { i \u003d\u003e\n  KinesisUtils.createStream(ssc,\n    kinesisAppName, kinesisStreamName,\n    kinesisEndpointUrl, RegionUtils.getRegionMetadata.getRegionByEndpoint(kinesisEndpointUrl).getName(),\n    InitialPositionInStream.LATEST, Seconds(kinesisCheckpointIntervalSeconds),\n    StorageLevel.MEMORY_AND_DISK_SER_2, awsAccessKeyId, awsSecretKey)\n}\n\nval unionStreams \u003dssc.union(kinesisStream)\n\nval sqlContext \u003d new SQLContext(SparkContext.getOrCreate())\n\n//Processing each RDD and storing it in temporary table\nunionStreams.foreachRDD ((rdd: RDD[Array[Byte]], time: Time) \u003d\u003e {\n \n\nval rowRDD \u003d rdd.map(jstr \u003d\u003e new String(jstr))\nval df \u003d sqlContext.read.json(rowRDD)\ndf.createOrReplaceTempView(\"realTimeTable\")\nz.run(\"20170823-194338_1456614812\")\n})\n\nz.run(\"20170823-194338_1456614812\")",
+      "user": "jellin@qubole.com",
+      "dateUpdated": "Aug 23, 2017 8:01:18 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1503517381779_-540934093",
+      "id": "20170823-194301_1603341702",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "\nssc: org.apache.spark.streaming.StreamingContext \u003d org.apache.spark.streaming.StreamingContext@3a27dfd2\n\nkinesisStream: scala.collection.immutable.IndexedSeq[org.apache.spark.streaming.dstream.ReceiverInputDStream[Array[Byte]]] \u003d Vector(org.apache.spark.streaming.kinesis.KinesisInputDStream@4b864fae)\n\nunionStreams: org.apache.spark.streaming.dstream.DStream[Array[Byte]] \u003d org.apache.spark.streaming.dstream.UnionDStream@5546fcf4\n\nwarning: there was one deprecation warning; re-run with -deprecation for details\n\nsqlContext: org.apache.spark.sql.SQLContext \u003d org.apache.spark.sql.SQLContext@2b993366\n"
+      },
+      "dateCreated": "Aug 23, 2017 7:43:01 PM",
+      "dateStarted": "Aug 23, 2017 8:01:18 PM",
+      "dateFinished": "Aug 23, 2017 8:01:24 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "ssc.start()",
+      "user": "jellin@qubole.com",
+      "dateUpdated": "Aug 23, 2017 8:01:31 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1503517402137_1259351983",
+      "id": "20170823-194322_630070166",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": ""
+      },
+      "dateCreated": "Aug 23, 2017 7:43:22 PM",
+      "dateStarted": "Aug 23, 2017 8:01:31 PM",
+      "dateFinished": "Aug 23, 2017 8:01:35 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql \nselect avg(deviceValue), deviceId from realTimeTable where deviceParameter \u003d \u0027Temperature\u0027 group by deviceId",
+      "user": "jellin@qubole.com",
+      "dateUpdated": "Aug 23, 2017 8:01:58 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "multiBarChart",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [
+            {
+              "name": "deviceId",
+              "index": 1.0,
+              "aggr": "sum"
+            }
+          ],
+          "values": [
+            {
+              "name": "avg(deviceValue)",
+              "index": 0.0,
+              "aggr": "sum"
+            }
+          ],
+          "groups": [],
+          "scatter": {
+            "yAxis": {
+              "name": "deviceId",
+              "index": 1.0,
+              "aggr": "sum"
+            }
+          }
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/sql",
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "JOB UI",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "https://api.qubole.com/cluster-proxy?encodedUrl\u003dhttp%3A%2F%2Fec2-54-159-196-70.compute-1.amazonaws.com%3A8088%2Fproxy%2Fapplication_1503516789478_0005/jobs/job?spark\u003dtrue\u0026id\u003d16",
+            "https://api.qubole.com/cluster-proxy?encodedUrl\u003dhttp%3A%2F%2Fec2-54-159-196-70.compute-1.amazonaws.com%3A8088%2Fproxy%2Fapplication_1503516789478_0005/jobs/job?spark\u003dtrue\u0026id\u003d17",
+            "https://api.qubole.com/cluster-proxy?encodedUrl\u003dhttp%3A%2F%2Fec2-54-159-196-70.compute-1.amazonaws.com%3A8088%2Fproxy%2Fapplication_1503516789478_0005/jobs/job?spark\u003dtrue\u0026id\u003d18",
+            "https://api.qubole.com/cluster-proxy?encodedUrl\u003dhttp%3A%2F%2Fec2-54-159-196-70.compute-1.amazonaws.com%3A8088%2Fproxy%2Fapplication_1503516789478_0005/jobs/job?spark\u003dtrue\u0026id\u003d19",
+            "https://api.qubole.com/cluster-proxy?encodedUrl\u003dhttp%3A%2F%2Fec2-54-159-196-70.compute-1.amazonaws.com%3A8088%2Fproxy%2Fapplication_1503516789478_0005/jobs/job?spark\u003dtrue\u0026id\u003d20"
+          ],
+          "interpreterSettingId": "2BWYCWZ2V216711474918731687"
+        }
+      },
+      "jobName": "paragraph_1503517418530_-1873442128",
+      "id": "20170823-194338_1456614812",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TABLE",
+        "msg": "avg(deviceValue)\tdeviceId\n22.4\tSBS05\n21.5\tSB07\n20.0\tSBS03\n22.0\tSB06\n28.0\tSBS04\n25.5\tSBS01\n22.5\tSBS02\n"
+      },
+      "dateCreated": "Aug 23, 2017 7:43:38 PM",
+      "dateStarted": "Aug 23, 2017 8:04:00 PM",
+      "dateFinished": "Aug 23, 2017 8:04:02 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql \nselect * from realTimeTable",
+      "user": "jellin@qubole.com",
+      "dateUpdated": "Aug 23, 2017 8:02:22 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/sql"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "JOB UI",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            "https://api.qubole.com/cluster-proxy?encodedUrl\u003dhttp%3A%2F%2Fec2-54-159-196-70.compute-1.amazonaws.com%3A8088%2Fproxy%2Fapplication_1503516789478_0005/jobs/job?spark\u003dtrue\u0026id\u003d8"
+          ],
+          "interpreterSettingId": "2BWYCWZ2V216711474918731687"
+        }
+      },
+      "jobName": "paragraph_1503517438356_-1748383411",
+      "id": "20170823-194358_39798446",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TABLE",
+        "msg": "dateTime\tdeviceId\tdeviceParameter\tdeviceValue\n2017-08-23 20:00:21\tSBS01\tSound\t139\n2017-08-23 20:00:22\tSBS03\tHumidity\t83\n2017-08-23 20:00:23\tSBS02\tTemperature\t23\n2017-08-23 20:00:24\tSBS02\tTemperature\t29\n2017-08-23 20:00:25\tSB07\tFlow\t94\n2017-08-23 20:00:26\tSB07\tSound\t114\n2017-08-23 20:00:27\tSB06\tTemperature\t33\n2017-08-23 20:00:28\tSB07\tTemperature\t17\n2017-08-23 20:00:29\tSBS04\tFlow\t64\n2017-08-23 20:00:30\tSBS03\tSound\t112\n2017-08-23 20:00:31\tSBS01\tTemperature\t15\n2017-08-23 20:00:32\tSBS04\tSound\t101\n2017-08-23 20:00:33\tSB07\tTemperature\t25\n2017-08-23 20:00:34\tSBS03\tTemperature\t28\n2017-08-23 20:00:36\tSB07\tSound\t133\n2017-08-23 20:00:37\tSB07\tFlow\t74\n2017-08-23 20:00:38\tSB07\tTemperature\t17\n2017-08-23 20:00:39\tSBS03\tTemperature\t15\n2017-08-23 20:00:40\tSBS04\tSound\t102\n2017-08-23 20:00:41\tSB06\tHumidity\t71\n2017-08-23 20:00:42\tSBS01\tTemperature\t21\n2017-08-23 20:00:43\tSBS01\tSound\t132\n2017-08-23 20:00:44\tSBS05\tFlow\t93\n2017-08-23 20:00:51\tSBS04\tTemperature\t32\n2017-08-23 20:00:52\tSBS03\tSound\t126\n2017-08-23 20:00:53\tSBS02\tTemperature\t17\n2017-08-23 20:00:54\tSBS02\tHumidity\t73\n2017-08-23 20:00:55\tSB06\tTemperature\t34\n2017-08-23 20:00:56\tSB06\tTemperature\t31\n2017-08-23 20:00:57\tSBS05\tSound\t106\n2017-08-23 20:00:58\tSBS02\tSound\t138\n2017-08-23 20:00:59\tSBS01\tSound\t117\n2017-08-23 20:01:00\tSBS01\tSound\t126\n2017-08-23 20:01:02\tSBS04\tTemperature\t34\n2017-08-23 20:01:03\tSB07\tSound\t132\n2017-08-23 20:01:04\tSBS03\tTemperature\t33\n2017-08-23 20:01:05\tSBS04\tTemperature\t20\n2017-08-23 20:01:06\tSBS05\tTemperature\t18\n2017-08-23 20:01:07\tSBS04\tHumidity\t51\n2017-08-23 20:01:08\tSB06\tHumidity\t65\n2017-08-23 20:01:09\tSB06\tSound\t102\n2017-08-23 20:01:10\tSBS04\tTemperature\t21\n2017-08-23 20:01:11\tSB06\tSound\t100\n2017-08-23 20:01:12\tSBS03\tTemperature\t30\n2017-08-23 20:01:13\tSBS03\tFlow\t91\n2017-08-23 20:01:14\tSB06\tTemperature\t22\n2017-08-23 20:01:15\tSB06\tTemperature\t26\n2017-08-23 20:01:17\tSBS05\tTemperature\t35\n2017-08-23 20:01:18\tSB06\tTemperature\t25\n2017-08-23 20:01:19\tSB06\tTemperature\t16\n2017-08-23 20:01:20\tSBS04\tSound\t104\n2017-08-23 20:01:21\tSBS03\tSound\t115\n2017-08-23 20:01:22\tSB07\tHumidity\t66\n2017-08-23 20:01:23\tSB07\tTemperature\t22\n2017-08-23 20:01:24\tSBS05\tTemperature\t23\n2017-08-23 20:01:25\tSBS01\tTemperature\t20\n2017-08-23 20:01:26\tSBS01\tSound\t133\n2017-08-23 20:01:27\tSBS03\tTemperature\t35\n2017-08-23 20:01:28\tSBS01\tHumidity\t89\n2017-08-23 20:01:29\tSBS01\tTemperature\t25\n2017-08-23 20:01:30\tSB06\tSound\t118\n2017-08-23 20:01:32\tSBS05\tTemperature\t21\n2017-08-23 20:01:33\tSBS01\tHumidity\t78\n2017-08-23 20:01:34\tSBS01\tTemperature\t16\n2017-08-23 20:01:35\tSBS02\tHumidity\t84\n2017-08-23 20:01:36\tSB07\tHumidity\t72\n2017-08-23 20:01:37\tSB06\tHumidity\t59\n2017-08-23 20:01:38\tSBS02\tTemperature\t22\n2017-08-23 20:01:39\tSBS01\tSound\t132\n2017-08-23 20:01:40\tSB07\tFlow\t69\n2017-08-23 20:01:41\tSBS03\tFlow\t87\n2017-08-23 20:01:42\tSBS04\tTemperature\t23\n2017-08-23 20:01:44\tSBS02\tSound\t120\n2017-08-23 20:01:45\tSBS03\tTemperature\t18\n2017-08-23 20:01:46\tSBS05\tTemperature\t33\n2017-08-23 20:01:47\tSBS03\tTemperature\t26\n2017-08-23 20:01:48\tSBS01\tSound\t112\n2017-08-23 20:01:49\tSBS04\tHumidity\t68\n2017-08-23 20:01:50\tSBS04\tHumidity\t73\n2017-08-23 20:01:51\tSBS01\tFlow\t63\n2017-08-23 20:01:52\tSBS04\tFlow\t69\n2017-08-23 20:01:53\tSB06\tTemperature\t26\n2017-08-23 20:01:54\tSBS01\tSound\t136\n2017-08-23 20:01:55\tSBS05\tTemperature\t24\n2017-08-23 20:01:56\tSBS04\tFlow\t100\n2017-08-23 20:01:58\tSB07\tHumidity\t58\n2017-08-23 20:01:59\tSBS02\tSound\t119\n"
+      },
+      "dateCreated": "Aug 23, 2017 7:43:58 PM",
+      "dateStarted": "Aug 23, 2017 8:02:22 PM",
+      "dateFinished": "Aug 23, 2017 8:02:22 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "",
+      "user": "jellin@qubole.com",
+      "dateUpdated": "Aug 23, 2017 7:49:47 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "enabled": true,
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1503517764997_-551015306",
+      "id": "20170823-194924_1520739497",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": ""
+      },
+      "dateCreated": "Aug 23, 2017 7:49:24 PM",
+      "dateStarted": "Aug 23, 2017 7:49:47 PM",
+      "dateFinished": "Aug 23, 2017 7:49:47 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "kinesis",
+  "id": "6MRP6DJ3NG1503516854",
+  "angularObjects": {
+    "2BW66EJ8D216711474918731752:shared_process": [],
+    "2BXY3SDKA216711474918731745:shared_process": [],
+    "2BY9SNRPZ216711474918731748:shared_process": [],
+    "2BWYCWZ2V216711474918731687:shared_process": []
+  },
+  "config": {
+    "isDashboard": false
+  },
+  "info": {},
+  "source": "FCN"
+}
