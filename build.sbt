@@ -7,7 +7,7 @@ libraryDependencies ++= Seq(
 "org.apache.spark" %% "spark-core" % "2.2.0" % "provided",
   "org.apache.spark" %% "spark-streaming" % "2.2.0" % "provided",
   "org.apache.spark" %% "spark-sql" % "2.2.0" % "provided",
-   "org.apache.spark" % "spark-streaming-kinesis-asl_2.11" % "2.2.0"
+   "org.apache.spark" % "spark-streaming-kinesis-asl_2.11" % "2.2.0" % "provided",
 
 
 )
